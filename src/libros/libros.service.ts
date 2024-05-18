@@ -1,4 +1,4 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import { BadRequestException, Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { Libro } from './entities/libro.entity';
@@ -17,9 +17,21 @@ export class LibrosService {
         private editorialesRepository: Repository<Editorial>,
     ) { }
 
-    findAll(): Promise<Libro[]> {
-        return this.librosRepository.find({ relations: ['autores', 'editorial'] })
-    }
+    async findAll(filter?: string, page?: number, limit?: number): Promise<Libro[]> {
+        const queryBuilder = this.librosRepository.createQueryBuilder('libro')
+          .leftJoinAndSelect('libro.autores', 'autor')
+          .leftJoinAndSelect('libro.editorial', 'editorial');
+    
+        if (filter) {
+          queryBuilder.andWhere('libro.categoria = :filter', { filter });
+        }
+    
+        if (page && limit) {
+          queryBuilder.skip((page - 1) * limit).take(limit);
+        }
+    
+        return queryBuilder.getMany();
+      }
 
     async findOne(id: number): Promise<Libro> {
         const libro = await this.librosRepository.findOne({
@@ -33,25 +45,30 @@ export class LibrosService {
         return libro;
     }
 
-    async createLibro(libro: Libro): Promise<Libro>{
-        if(libro.autores && libro.autores.length > 0){
+    async createLibro(libro: Libro): Promise<Libro> {
+        if (libro.autores && libro.autores.length > 0) {
             for (const autor of libro.autores) {
-                const autorExistente = await this.autoresRepository.findOne({where: {id: autor.id}});
-                if (!autorExistente){
-                    throw new NotFoundException(`El autor con el ID ${autor.id} no existe`)
-                } 
-                
+                const autorExistente = await this.autoresRepository.findOne({ where: { id: autor.id } });
+                if (!autorExistente) {
+                    throw new NotFoundException(`El autor con el ID ${autor.id} no existe`);
+                }
             }
-        }
-        
-        if(libro.editorial){
-            const editorialExistente = await this.editorialesRepository.findOne({where: {id: libro.editorial.id}})
-            if(!editorialExistente){
-                throw new NotFoundException(`La editorial con el ID ${libro.editorial.id} no existe`)
-            }
+        } else {
+            throw new BadRequestException('El libro debe tener al menos un autor.');
         }
 
-        return this.librosRepository.save(libro)
+        if (libro.editorial) {
+            const editorialExistente = await this.editorialesRepository.findOne({ where: { id: libro.editorial.id } });
+            if (!editorialExistente) {
+                throw new NotFoundException(`La editorial con el ID ${libro.editorial.id} no existe`);
+            }
+        } else {
+            throw new BadRequestException('El libro debe tener una editorial.');
+        }
+
+
+
+        return this.librosRepository.save(libro);
     }
 
 

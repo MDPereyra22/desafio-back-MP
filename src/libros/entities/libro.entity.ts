@@ -22,11 +22,11 @@ export class Libro{
     @Column('text')
     descripcion: string;
 
-    @ManyToMany(() => Autor, autor => autor.libros)
+    @ManyToMany(() => Autor, (autor) => autor.libros, { nullable: false })
     @JoinTable()
     autores: Autor[];
 
-    @ManyToOne(()=> Editorial, editorial => editorial.libros)
-    editorial: Editorial;
+    @ManyToOne(() => Editorial, (editorial) => editorial.libros, { nullable: false })
+  editorial: Editorial;
 
 }
