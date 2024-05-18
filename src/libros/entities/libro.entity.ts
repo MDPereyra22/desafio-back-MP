@@ -1,10 +1,10 @@
 import { Autor } from "src/autores/entities/autor.entity";
 import { Editorial } from "src/editoriales/entities/editorial.entity";
-import { Entity, PrimaryColumn, Column, JoinTable, ManyToMany, ManyToOne } from "typeorm";
+import { Entity, PrimaryGeneratedColumn, Column, JoinTable, ManyToMany, ManyToOne } from "typeorm";
 
 @Entity()
 export class Libro{
-    @PrimaryColumn()
+    @PrimaryGeneratedColumn()
     id: number;
 
     @Column()
