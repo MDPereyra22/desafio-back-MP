@@ -2,8 +2,8 @@ import { Controller, Get, Post, Body, Param, Put, Delete } from '@nestjs/common'
 import { Autor } from './entities/autor.entity';
 import { AutoresService } from './autores.service';
 
-@Controller('autoes')
-export class AutoressController {
+@Controller('autores')
+export class AutoresController {
     constructor(
         private readonly autoresService: AutoresService
     ) { }
