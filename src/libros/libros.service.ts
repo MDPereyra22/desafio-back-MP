@@ -4,6 +4,7 @@ import { Repository } from 'typeorm';
 import { Libro } from './entities/libro.entity';
 import { Autor } from 'src/autores/entities/autor.entity';
 import { Editorial } from 'src/editoriales/entities/editorial.entity';
+import * as moment from 'moment';
 
 
 @Injectable()
@@ -46,38 +47,94 @@ export class LibrosService {
     }
 
     async createLibro(libro: Libro): Promise<Libro> {
-        if (libro.autores && libro.autores.length > 0) {
+        try {
+            if (!libro.autores || libro.autores.length === 0) {
+                throw new BadRequestException('El libro debe tener al menos un autor.');
+            }
+
             for (const autor of libro.autores) {
                 const autorExistente = await this.autoresRepository.findOne({ where: { id: autor.id } });
                 if (!autorExistente) {
                     throw new NotFoundException(`El autor con el ID ${autor.id} no existe`);
                 }
             }
-        } else {
-            throw new BadRequestException('El libro debe tener al menos un autor.');
-        }
 
-        if (libro.editorial) {
+            if (!libro.editorial) {
+                throw new BadRequestException('El libro debe tener una editorial.');
+            }
+
             const editorialExistente = await this.editorialesRepository.findOne({ where: { id: libro.editorial.id } });
             if (!editorialExistente) {
                 throw new NotFoundException(`La editorial con el ID ${libro.editorial.id} no existe`);
             }
-        } else {
-            throw new BadRequestException('El libro debe tener una editorial.');
+
+            libro.fechaLanzamiento = this.normalizeDate(libro.fechaLanzamiento);
+
+            return await this.librosRepository.save(libro);
+        } catch (error) {
+            throw new BadRequestException(`Error al crear el libro: ${error.message}`);
         }
+    }
 
 
-
+    async updateLibro(id: number, libroData: Partial<Libro>): Promise<Libro> {
+        const libro = await this.librosRepository.findOne({
+            where: { id },
+            relations: ['autores', 'editorial']
+        });
+    
+        if (!libro) {
+            throw new NotFoundException(`El libro con el ID ${id} no existe`);
+        }
+    
+        libro.titulo = libroData.titulo ?? libro.titulo;
+        libro.categoria = libroData.categoria ?? libro.categoria;
+        libro.precio = libroData.precio ?? libro.precio;
+        libro.descripcion = libroData.descripcion ?? libro.descripcion;
+    
+        if (libroData.fechaLanzamiento) {
+            libro.fechaLanzamiento = this.normalizeDate(libroData.fechaLanzamiento);
+        }
+    
+        if (libroData.autores && libroData.autores.length > 0) {
+            const autores = [];
+            for (const autor of libroData.autores) {
+                const autorExistente = await this.autoresRepository.findOne({ where: { id: autor.id } });
+                if (!autorExistente) {
+                    throw new NotFoundException(`El autor con el ID ${autor.id} no existe`);
+                }
+                autores.push(autorExistente);
+            }
+            libro.autores = autores;
+        }
+    
+        if (libroData.editorial) {
+            const editorialExistente = await this.editorialesRepository.findOne({ where: { id: libroData.editorial.id } });
+            if (!editorialExistente) {
+                throw new NotFoundException(`La editorial con el ID ${libroData.editorial.id} no existe`);
+            }
+            libro.editorial = editorialExistente;
+        }
+    
         return this.librosRepository.save(libro);
     }
-
-
-    async updateLibro(id: number, libro: Libro) : Promise<Libro> {
-        await this.librosRepository.update(id, libro);
-        return this.findOne(id);
-    }
+    
 
     async removeLibro(id:number) : Promise<void>{
         await this.librosRepository.delete(id)
     }
+
+    private normalizeDate(dateStr: string): string {
+        const formats = ['DD/MM/YYYY', 'DD/MM/YY'];
+        const date = moment(dateStr, formats, true);
+
+        if (!date.isValid()) {
+            throw new BadRequestException(`Formato de fecha inválido: ${dateStr}`);
+        }
+
+        return date.toISOString();
+    }
+
 }
+
+
