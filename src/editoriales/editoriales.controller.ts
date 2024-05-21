@@ -1,7 +1,9 @@
 import { Controller, Get, Post, Body, Param, Put, Delete } from '@nestjs/common';
 import { Editorial } from './entities/editorial.entity';
 import { EditorialesService } from './editoriales.service';
-import { ApiOperation } from '@nestjs/swagger';
+import { ApiOperation, ApiResponse } from '@nestjs/swagger';
+import { CreateEditorialDto } from './dto/create-editorial.dto';
+import { UpdateEditorialDto } from './dto/update-editorial.dto';
 
 @Controller('editoriales')
 export class EditorialesController {
@@ -22,14 +24,19 @@ export class EditorialesController {
 
     @Post()
     @ApiOperation({ summary: 'Crear una nueva editorial' })
-    create(@Body() editorial: Editorial) : Promise<Editorial>{
-        return this.editorialesService.createEditorial(editorial)
+    @ApiResponse({ status: 201, description: 'La editorial ha sido creada con éxito.', type: Editorial })
+    @ApiResponse({ status: 400, description: 'Datos de entrada incorrectos.' })
+    async create(@Body() createEditorialDto: CreateEditorialDto): Promise<Editorial> {
+      return this.editorialesService.createEditorial(createEditorialDto);
     }
-
+  
     @Put(':id')
     @ApiOperation({ summary: 'Actualizar una editorial existente' })
-    update(@Param('id') id: number, @Body() editorial: Editorial) : Promise<Editorial>{
-        return this.editorialesService.updateEditorial(id,editorial)
+    @ApiResponse({ status: 200, description: 'La editorial ha sido actualizada con éxito.', type: Editorial })
+    @ApiResponse({ status: 404, description: 'La editorial con el ID especificado no existe.' })
+    @ApiResponse({ status: 400, description: 'Datos de entrada incorrectos.' })
+    async update(@Param('id') id: number, @Body() updateEditorialDto: UpdateEditorialDto): Promise<Editorial> {
+      return this.editorialesService.updateEditorial(id, updateEditorialDto);
     }
 
     @Delete(':id')
