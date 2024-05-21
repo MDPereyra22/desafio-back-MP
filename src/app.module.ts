@@ -1,6 +1,6 @@
 import { Module } from '@nestjs/common';
-import { AppController } from './app.controller';
-import { AppService } from './app.service';
+// import { AppController } from './app.controller';
+// import { AppService } from './app.service';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { LibrosModule } from './libros/libros.module';
 import { AutoresModule } from './autores/autores.module';
@@ -27,7 +27,7 @@ import { Autor } from './autores/entities/autor.entity';
     AutoresModule,
     EditorialesModule,
 ],
-  controllers: [AppController],
-  providers: [AppService],
+  // controllers: [AppController],
+  // providers: [AppService],
 })
 export class AppModule { }
