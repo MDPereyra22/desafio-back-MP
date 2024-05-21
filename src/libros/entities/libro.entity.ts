@@ -1,3 +1,4 @@
+import { ApiHideProperty } from "@nestjs/swagger";
 import { Autor } from "src/autores/entities/autor.entity";
 import { Editorial } from "src/editoriales/entities/editorial.entity";
 import { Entity, PrimaryGeneratedColumn, Column, JoinTable, ManyToMany, ManyToOne } from "typeorm";
@@ -5,6 +6,7 @@ import { Entity, PrimaryGeneratedColumn, Column, JoinTable, ManyToMany, ManyToOn
 @Entity()
 export class Libro{
     @PrimaryGeneratedColumn()
+    @ApiHideProperty()
     id: number;
 
     @Column()

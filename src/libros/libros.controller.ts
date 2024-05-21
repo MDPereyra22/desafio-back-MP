@@ -1,6 +1,7 @@
 import { Controller, Get, Post, Body, Param, Put, Delete, BadRequestException, NotFoundException, Query, HttpCode, HttpStatus } from '@nestjs/common';
 import { LibrosService } from './libros.service';
 import { Libro } from './entities/libro.entity';
+import { ApiHideProperty, ApiQuery } from '@nestjs/swagger';
 
 @Controller('libros')
 export class LibrosController {
@@ -9,6 +10,9 @@ export class LibrosController {
     ) { }
 
     @Get()
+    @ApiQuery({name:'filter', required: false, type: String})
+    @ApiQuery({name:'page', required: false, type: Number})
+    @ApiQuery({name:'limit', required: false, type: Number})
   findAll(
     @Query('filter') filter?: string,
     @Query('page') page: number = 1,

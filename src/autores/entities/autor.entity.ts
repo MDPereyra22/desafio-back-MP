@@ -1,10 +1,12 @@
 import { Entity, PrimaryGeneratedColumn, Column, ManyToMany } from "typeorm";
 import { Libro } from "src/libros/entities/libro.entity";
 import { IsDNI } from "src/validators/dni.validators";
+import { ApiHideProperty } from "@nestjs/swagger";
 
 @Entity()
 export class Autor{
     @PrimaryGeneratedColumn()
+    @ApiHideProperty()
     id: number;
 
     @Column()
@@ -18,6 +20,7 @@ export class Autor{
     dni: string;
 
     @ManyToMany(()=> Libro, libro=> libro.autores)
+    @ApiHideProperty()
     libros: Libro[]
 
 }
