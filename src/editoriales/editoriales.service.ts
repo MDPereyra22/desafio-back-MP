@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { Editorial } from './entities/editorial.entity';
@@ -22,9 +22,17 @@ export class EditorialesService {
         return this.editorialesRepository.save(editorial);
     }
 
-    async updateEditorial(id: number, editorial: Editorial) : Promise<Editorial>{
-        await this.editorialesRepository.update(id, editorial);
-        return this.findOne(id)
+    async updateEditorial(id: number, editorialData: Partial<Editorial>) : Promise<Editorial>{
+        const editorial = await this.editorialesRepository.findOne( {where: {id}})
+        if (!editorial) {
+            throw new NotFoundException(`La editorial con el ID ${id} no existe`);
+        }
+        editorial.nombre = editorialData.nombre ?? editorial.nombre;
+        editorial.direccion = editorialData.direccion ?? editorial.direccion;
+        editorial.cuit = editorialData.cuit ?? editorial.cuit;
+
+        return this.editorialesRepository.save(editorial);
+
     }
 
     async removeEditorial(id: number) : Promise<void>{
