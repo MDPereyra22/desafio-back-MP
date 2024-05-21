@@ -13,12 +13,20 @@ export class AutoresService {
         private autoresRepository: Repository<Autor>,
     ) {}
 
-    findAll() : Promise<Autor[]>{
-        return this.autoresRepository.find()
+    async findAll(): Promise<Autor[]> {
+        const autores = await this.autoresRepository.find();
+        if (autores.length === 0) {
+            throw new NotFoundException('No se encontraron autores.');
+        }
+        return autores;
     }
 
-    findOne(id: number) : Promise<Autor>{
-        return this.autoresRepository.findOne({where:{id}});
+    async findOne(id: number): Promise<Autor> {
+        const autor = await this.autoresRepository.findOne({ where: { id } });
+        if (!autor) {
+            throw new NotFoundException(`El autor con el ID ${id} no existe.`);
+        }
+        return autor;
     }
 
     createAutor(autor: Autor) : Promise<Autor>{
@@ -39,7 +47,10 @@ export class AutoresService {
         return this.autoresRepository.save(autor);
     }
 
-    async remove(id:number) : Promise<void>{
-        await this.autoresRepository.delete(id)
+    async removeAutor(id: number): Promise<void> {
+        const result = await this.autoresRepository.delete(id);
+        if (result.affected === 0) {
+            throw new NotFoundException(`El autor con el ID ${id} no existe.`);
+        }
     }
 }

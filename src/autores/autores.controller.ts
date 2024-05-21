@@ -29,6 +29,6 @@ export class AutoresController {
 
     @Delete(':id')
     delete(@Param('id') id:number) : Promise<void>{
-        return this.autoresService.remove(id)
+        return this.autoresService.removeAutor(id)
     }
 }

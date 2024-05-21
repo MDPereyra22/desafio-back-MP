@@ -10,12 +10,20 @@ export class EditorialesService {
         private editorialesRepository : Repository<Editorial>
     ) {}
 
-    findAll() : Promise<Editorial[]>{
-        return this.editorialesRepository.find()
+    async findAll(): Promise<Editorial[]> {
+        const editoriales = await this.editorialesRepository.find();
+        if (editoriales.length === 0) {
+            throw new NotFoundException('No se encontraron editoriales.');
+        }
+        return editoriales;
     }
 
-    findOne(id: number) : Promise<Editorial>{
-        return this.editorialesRepository.findOne({where: {id}})
+    async findOne(id: number): Promise<Editorial> {
+        const editorial = await this.editorialesRepository.findOne({ where: { id } });
+        if (!editorial) {
+            throw new NotFoundException(`La editorial con el ID ${id} no existe.`);
+        }
+        return editorial;
     }
 
     createEditorial(editorial: Editorial) : Promise<Editorial>{
@@ -35,7 +43,10 @@ export class EditorialesService {
 
     }
 
-    async removeEditorial(id: number) : Promise<void>{
-        await this.editorialesRepository.delete(id);
+    async removeEditorial(id: number): Promise<void> {
+        const result = await this.editorialesRepository.delete(id);
+        if (result.affected === 0) {
+            throw new NotFoundException(`La editorial con el ID ${id} no existe.`);
+        }
     }
 }

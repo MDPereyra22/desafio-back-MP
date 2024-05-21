@@ -121,8 +121,13 @@ export class LibrosService {
     
 
     async removeLibro(id:number) : Promise<void>{
-        await this.librosRepository.delete(id)
+        const result = await this.librosRepository.delete(id)
+        if(result.affected === 0){
+            throw new NotFoundException(`El libro con el ID ${id} no existe.`)
+        }
     }
+
+
 
     private normalizeDate(dateStr: string): string {
         const formats = ['DD/MM/YYYY', 'DD/MM/YY'];
