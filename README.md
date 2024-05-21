@@ -14,11 +14,11 @@ Antes de empezar, asegúrate de tener instalado en tu sistema:
 
 1. Clona este repositorio en tu máquina local:
 
-git clone https://github.com/tuusuario/proyecto-libros-autores.git
+git clone https://github.com/MDPereyra22/desafio-back-MP.git
 
 2. Accede al directorio del proyecto:
 
-cd proyecto-libros-autores
+cd desafio-back-mp
 
 3. Instala las dependencias del proyecto:
 
@@ -32,7 +32,7 @@ Crea un archivo .env con tus credenciales de base de datos y otras configuracion
 
 1. Inicia el servidor:
 
-nest start --watch
+nest start
 
 2. Accede a la documentación de la API en tu navegador:
 
