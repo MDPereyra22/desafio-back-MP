@@ -1,4 +1,4 @@
-import { Controller, Get, Post, Body, Param, Put, Delete, BadRequestException, NotFoundException, Query } from '@nestjs/common';
+import { Controller, Get, Post, Body, Param, Put, Delete, BadRequestException, NotFoundException, Query, HttpCode, HttpStatus } from '@nestjs/common';
 import { LibrosService } from './libros.service';
 import { Libro } from './entities/libro.entity';
 
@@ -39,6 +39,7 @@ export class LibrosController {
     }
 
     @Delete(':id')
+    @HttpCode(HttpStatus.NO_CONTENT)
     delete(@Param('id') id:number) : Promise<void>{
         return this.libroService.removeLibro(id)
     }
