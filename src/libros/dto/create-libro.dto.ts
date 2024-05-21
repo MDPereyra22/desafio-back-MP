@@ -1,4 +1,3 @@
-// src/libros/dto/create-libro.dto.ts
 import { IsNotEmpty, IsString, IsNumber, IsArray, IsDateString, ValidateNested } from 'class-validator';
 import { Type } from 'class-transformer';
 

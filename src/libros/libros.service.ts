@@ -51,7 +51,6 @@ export class LibrosService {
     async createLibro(createLibroDto: CreateLibroDto): Promise<Libro> {
         const { autores, editorial, ...libroData } = createLibroDto;
     
-        // Validar y obtener los autores
         const autoresEntities = [];
         for (const autor of autores) {
           const autorExistente = await this.autoresRepository.findOne({ where: { id: autor.id } });
@@ -61,13 +60,11 @@ export class LibrosService {
           autoresEntities.push(autorExistente);
         }
     
-        // Validar y obtener la editorial
         const editorialExistente = await this.editorialesRepository.findOne({ where: { id: editorial.id } });
         if (!editorialExistente) {
           throw new NotFoundException(`La editorial con el ID ${editorial.id} no existe`);
         }
     
-        // Crear el libro
         const libro = this.librosRepository.create({
           ...libroData,
           autores: autoresEntities,
