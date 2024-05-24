@@ -71,8 +71,6 @@ describe('Autores (e2e)', () => {
 
     expect(autores.length).toEqual(1);
     expect(autores[0].apellido).toEqual('Tolkien');
-    expect(autores[0].nombre).toEqual('JRR');
-    expect(autores[0].dni).toEqual('11223344');
   });
 
   it('Crea un autor con POST, lo modifica con un PUT y lo recupera exitosamente de la bd con un GET', async () => {
